@@ -1,4 +1,6 @@
 import math
+import sys
+current_set = "set1"
 
 # Read input files  
 def read_docs(filename):
@@ -74,54 +76,51 @@ def angle(v1, v2):
 
 # Main  
 def main():
-    docs = read_docs("CM1208testcases/set3/docs.txt")
-    queries = read_queries("CM1208testcases/set3/queries.txt")
+    # Check if file paths are provided as arguments
+    if len(sys.argv) == 3:
+        docs_path = sys.argv[1]
+        queries_path = sys.argv[2]
+    else:
+        # Default paths for testing
+        docs_path = f"CM1208testcases/{current_set}/docs.txt"
+        queries_path = f"CM1208testcases/{current_set}/queries.txt"
 
+    docs = read_docs(docs_path)
+    queries = read_queries(queries_path)
     dictionary = build_dictionary(docs)
     print(f"Words in dictionary: {len(dictionary)}")
-
     inverted_index = build_inverted_index(docs)
-
-    # precompute vectors for efficiency
+    # Precompute vectors for efficiency
     doc_vectors = build_doc_vectors(docs, dictionary)
     word_index = {word: i for i, word in enumerate(dictionary)}
-
-    # Process queries  
+    # Process queries
     for query in queries:
         print(f"Query: {' '.join(query)}")
-
-        # filter valid words
+        # Filter valid words
         valid_words = [w for w in query if w in dictionary]
-
-        # find relevant docs (intersection)
+        # Find relevant docs (intersection)
         if not valid_words:
             relevant_docs = set()
         else:
             relevant_docs = inverted_index[valid_words[0]].copy()
             for w in valid_words[1:]:
                 relevant_docs &= inverted_index[w]
-
-        # print relevant docs
+        # Print relevant docs
         if relevant_docs:
             print("Relevant documents:", *relevant_docs)
         else:
             print("Relevant documents:")
-
-        # rank documents by angle
+        # Rank documents by angle
         query_vec = build_query_vector(valid_words, dictionary, word_index)
-
         results = []
         for doc_id in relevant_docs:
             doc_vec = doc_vectors[doc_id - 1]
             ang = angle(query_vec, doc_vec)
             results.append((doc_id, ang))
-
-        # sort by smallest angle (most relevant first)
+        # Sort by smallest angle
         results.sort(key=lambda x: x[1])
-
         for doc_id, ang in results:
             print(f"{doc_id} {ang:.2f}")
-
 
 if __name__ == "__main__":
     main()
