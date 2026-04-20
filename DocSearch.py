@@ -85,19 +85,26 @@ def main():
         docs_path = f"CM1208testcases/{current_set}/docs.txt"
         queries_path = f"CM1208testcases/{current_set}/queries.txt"
 
+    # Read documents and queries
     docs = read_docs(docs_path)
     queries = read_queries(queries_path)
+
+    # Build dictionary and inverted index
     dictionary = build_dictionary(docs)
     print(f"Words in dictionary: {len(dictionary)}")
     inverted_index = build_inverted_index(docs)
+
     # Precompute vectors for efficiency
     doc_vectors = build_doc_vectors(docs, dictionary)
     word_index = {word: i for i, word in enumerate(dictionary)}
+
     # Process queries
     for query in queries:
         print(f"Query: {' '.join(query)}")
+
         # Filter valid words
         valid_words = [w for w in query if w in dictionary]
+
         # Find relevant docs (intersection)
         if not valid_words:
             relevant_docs = set()
@@ -105,11 +112,13 @@ def main():
             relevant_docs = inverted_index[valid_words[0]].copy()
             for w in valid_words[1:]:
                 relevant_docs &= inverted_index[w]
+
         # Print relevant docs
         if relevant_docs:
             print("Relevant documents:", *relevant_docs)
         else:
             print("Relevant documents:")
+
         # Rank documents by angle
         query_vec = build_query_vector(valid_words, dictionary, word_index)
         results = []
@@ -117,6 +126,7 @@ def main():
             doc_vec = doc_vectors[doc_id - 1]
             ang = angle(query_vec, doc_vec)
             results.append((doc_id, ang))
+
         # Sort by smallest angle
         results.sort(key=lambda x: x[1])
         for doc_id, ang in results:
