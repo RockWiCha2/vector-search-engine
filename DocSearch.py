@@ -1,5 +1,6 @@
 import math
 import sys
+import os
 current_set = "set1"
 
 # Read input files  
@@ -73,7 +74,6 @@ def angle(v1, v2):
 
     return math.degrees(math.acos(cos_theta))
 
-
 # Main  
 def main():
     # Check if file paths are provided as arguments
@@ -81,9 +81,10 @@ def main():
         docs_path = sys.argv[1]
         queries_path = sys.argv[2]
     else:
-        # Default paths for testing
-        docs_path = f"CM1208testcases/{current_set}/docs.txt"
-        queries_path = f"CM1208testcases/{current_set}/queries.txt"
+        # Default paths for testing (same directory as DocSearch.py)
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        docs_path = os.path.join(base_path, "docs.txt")
+        queries_path = os.path.join(base_path, "queries.txt")
 
     # Read documents and queries
     docs = read_docs(docs_path)
