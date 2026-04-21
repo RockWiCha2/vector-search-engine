@@ -131,7 +131,7 @@ def main():
         # Sort by smallest angle
         results.sort(key=lambda x: x[1])
         for doc_id, ang in results:
-            print(f"{doc_id} {ang:.2f}")
+            print(f"{doc_id} {ang:.5f}")
 
 if __name__ == "__main__":
     main()
